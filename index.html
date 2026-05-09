@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SafeWeb by Margaret</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #080b14;
+      --bg2: #0d1120;
+      --bg3: #111827;
+      --card: #0f1523;
+      --border: rgba(139,92,246,0.18);
+      --accent: #7c3aed;
+      --accent2: #06b6d4;
+      --accent3: #a78bfa;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --glow: rgba(124,58,237,0.35);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 5%;
+      background: rgba(8,11,20,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { display: flex; align-items: center; gap: .5rem; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem; }
+    .nav-logo svg { width: 28px; height: 28px; }
+    .nav-logo span { color: var(--accent2); font-size: .7rem; display: block; font-weight: 400; letter-spacing:.05em; }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: .9rem; transition: color .2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .nav-links a.active { border-bottom: 2px solid var(--accent2); padding-bottom: 2px; }
+    .nav-cta {
+      background: transparent; border: 1.5px solid var(--accent3);
+      color: var(--text); padding: .5rem 1.2rem; border-radius: 6px;
+      font-family: 'DM Sans', sans-serif; font-size: .9rem; cursor: pointer;
+      transition: all .2s;
+    }
+    .nav-cta:hover { background: var(--accent); border-color: var(--accent); }
+
+    /* ── HERO ── */
+    #home {
+      min-height: 100vh;
+      display: grid; grid-template-columns: 1fr 1fr;
+      align-items: center;
+      padding: 7rem 5% 4rem;
+      position: relative; overflow: hidden;
+    }
+    .hero-orb {
+      position: absolute; right: 5%; top: 50%; transform: translateY(-50%);
+      width: 480px; height: 480px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(124,58,237,0.25) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-orb2 {
+      position: absolute; right: 12%; top: 45%; transform: translateY(-50%);
+      width: 380px; height: 380px; border-radius: 50%;
+      border: 1.5px solid rgba(124,58,237,0.2);
+      pointer-events: none;
+      animation: pulse 4s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:.4;transform:translateY(-50%) scale(1)} 50%{opacity:.8;transform:translateY(-50%) scale(1.04)} }
+    .hero-text { position: relative; z-index: 2; }
+    .hero-tag { font-size: .8rem; color: var(--accent2); letter-spacing: .1em; text-transform: uppercase; margin-bottom: .8rem; display: flex; align-items: center; gap: .4rem; }
+    .hero-tag::before { content: ''; width: 24px; height: 2px; background: var(--accent2); display: inline-block; }
+    h1.hero-name {
+      font-family: 'Syne', sans-serif; font-size: clamp(2.8rem, 6vw, 5rem);
+      font-weight: 800; line-height: 1.05; margin-bottom: .4rem;
+      animation: fadeUp .7s ease both;
+    }
+    .hero-sub {
+      font-family: 'Syne', sans-serif; font-size: clamp(1rem,2vw,1.4rem);
+      color: var(--accent3); font-weight: 600; margin-bottom: 1.2rem;
+      animation: fadeUp .7s .1s ease both;
+    }
+    .hero-desc { color: var(--muted); max-width: 420px; line-height: 1.7; margin-bottom: 2rem; animation: fadeUp .7s .2s ease both; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:none} }
+    .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem; animation: fadeUp .7s .3s ease both; }
+    .btn-primary {
+      background: var(--accent); color: #fff; border: none;
+      padding: .75rem 1.6rem; border-radius: 8px; font-size: .95rem;
+      cursor: pointer; display: flex; align-items: center; gap: .5rem;
+      font-family: 'DM Sans', sans-serif; font-weight: 500;
+      box-shadow: 0 0 24px var(--glow); transition: all .2s;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 36px var(--glow); }
+    .btn-secondary {
+      background: transparent; color: var(--text);
+      border: 1.5px solid rgba(255,255,255,.2); padding: .75rem 1.6rem;
+      border-radius: 8px; font-size: .95rem; cursor: pointer;
+      display: flex; align-items: center; gap: .5rem;
+      font-family: 'DM Sans', sans-serif; transition: all .2s;
+    }
+    .btn-secondary:hover { border-color: var(--accent3); color: var(--accent3); }
+    .connect-label { font-size: .8rem; color: var(--muted); margin-bottom: .6rem; animation: fadeUp .7s .4s ease both; }
+    .social-links { display: flex; gap: 1rem; animation: fadeUp .7s .5s ease both; }
+    .social-links a {
+      width: 36px; height: 36px; border-radius: 8px;
+      border: 1px solid var(--border); display: grid; place-items: center;
+      color: var(--muted); text-decoration: none; transition: all .2s;
+    }
+    .social-links a:hover { border-color: var(--accent3); color: var(--accent3); background: rgba(124,58,237,.1); }
+
+    /* Hero right */
+    .hero-right { position: relative; z-index: 2; display: flex; justify-content: center; align-items: center; }
+    .hero-photo-wrap {
+      position: relative; width: 340px; height: 420px;
+    }
+    .hero-photo-placeholder {
+      width: 100%; height: 100%;
+      background: linear-gradient(135deg, rgba(124,58,237,.3), rgba(6,182,212,.15));
+      border-radius: 24px;
+      border: 1.5px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 5rem; color: rgba(255,255,255,.15);
+      overflow: hidden;
+    }
+    .hero-photo-placeholder img { width: 100%; height: 100%; object-fit: cover; border-radius: 24px; }
+    /* floating cards */
+    .float-card {
+      position: absolute; background: rgba(15,21,35,0.92);
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: .6rem .9rem; font-size: .75rem;
+      backdrop-filter: blur(12px);
+      animation: float 3s ease-in-out infinite;
+    }
+    .float-card.top-right { top: -10px; right: -60px; animation-delay: 0s; }
+    .float-card.bottom-left { bottom: 30px; left: -60px; animation-delay: 1.5s; }
+    .float-card.mid-right { top: 50%; right: -70px; transform: translateY(-50%); animation-delay: .8s; }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+    .float-card.mid-right { animation: float2 3s ease-in-out .8s infinite; }
+    @keyframes float2 { 0%,100%{transform:translateY(-50%)} 50%{transform:translateY(calc(-50% - 8px))} }
+    .float-card .fc-label { color: var(--muted); font-size: .65rem; margin-bottom: 2px; }
+    .float-card .fc-val { color: var(--accent2); font-weight: 600; }
+    .float-icon { font-size: 1.2rem; margin-bottom: 2px; }
+
+    /* ── SECTION BASE ── */
+    section { padding: 5rem 5%; position: relative; }
+    .sec-label { font-size: .75rem; color: var(--accent2); letter-spacing: .12em; text-transform: uppercase; margin-bottom: .5rem; }
+    .sec-title { font-family: 'Syne', sans-serif; font-size: clamp(1.6rem,3vw,2.4rem); font-weight: 700; margin-bottom: .5rem; }
+    .sec-divider { width: 40px; height: 3px; background: linear-gradient(90deg,var(--accent),var(--accent2)); border-radius: 2px; margin-bottom: 1.5rem; }
+    .sec-center { text-align: center; }
+    .sec-center .sec-divider { margin: 0 auto 1.5rem; }
+
+    /* ── SERVICES ── */
+    #services { background: var(--bg2); }
+    .services-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
+      gap: 1.2rem; margin-top: 2.5rem;
+    }
+    .service-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.6rem 1.2rem;
+      transition: all .25s; cursor: default;
+    }
+    .service-card:hover { border-color: var(--accent3); transform: translateY(-4px); box-shadow: 0 8px 32px rgba(124,58,237,.2); }
+    .service-icon { font-size: 1.8rem; margin-bottom: 1rem; }
+    .service-card h3 { font-family: 'Syne', sans-serif; font-size: .95rem; color: var(--accent2); margin-bottom: .5rem; }
+    .service-card p { font-size: .82rem; color: var(--muted); line-height: 1.6; }
+    .services-cta { text-align: center; margin-top: 2rem; }
+
+    /* ── SAFETY CHECKER ── */
+    #safety { background: var(--bg3); }
+    .safety-inner {
+      display: grid; grid-template-columns: 1fr 2fr;
+      gap: 3rem; align-items: center;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 20px; padding: 2.5rem;
+    }
+    .safety-icon-wrap { display: flex; justify-content: center; }
+    .safety-shield {
+      width: 100px; height: 100px; border-radius: 50%;
+      border: 2px solid var(--accent); display: grid; place-items: center;
+      font-size: 2.5rem;
+      box-shadow: 0 0 30px rgba(124,58,237,.3);
+      animation: pulse 3s ease-in-out infinite;
+    }
+    .safety-form { display: flex; flex-direction: column; gap: 1rem; }
+    .safety-form label { font-size: .8rem; color: var(--muted); }
+    .input-row { display: flex; gap: .8rem; }
+    .safety-input {
+      flex: 1; background: rgba(255,255,255,.05); border: 1px solid var(--border);
+      border-radius: 8px; padding: .75rem 1rem; color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: .9rem; outline: none;
+      transition: border-color .2s;
+    }
+    .safety-input:focus { border-color: var(--accent3); }
+    .safety-result {
+      background: rgba(16,185,129,.08); border: 1px solid rgba(16,185,129,.3);
+      border-radius: 8px; padding: .8rem 1rem;
+      display: flex; align-items: center; gap: .8rem; font-size: .85rem;
+    }
+    .safety-result .dot { width: 10px; height: 10px; background: #10b981; border-radius: 50%; flex-shrink: 0; }
+    .safety-result strong { color: #10b981; }
+
+    /* ── PROJECTS ── */
+    #projects { background: var(--bg2); }
+    .projects-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 2rem; }
+    .view-all { color: var(--accent3); font-size: .85rem; text-decoration: none; display: flex; align-items: center; gap: .3rem; }
+    .projects-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; }
+    .project-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+      overflow: hidden; transition: all .25s;
+    }
+    .project-card:hover { transform: translateY(-5px); box-shadow: 0 12px 40px rgba(124,58,237,.2); border-color: var(--accent3); }
+    .project-img {
+      height: 160px; background: linear-gradient(135deg, rgba(124,58,237,.25), rgba(6,182,212,.15));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3rem; position: relative; overflow: hidden;
+    }
+    .project-img::after { content: '↗'; position: absolute; top: 10px; right: 12px; font-size: .9rem; color: var(--muted); }
+    .project-body { padding: 1.2rem; }
+    .project-body h3 { font-family: 'Syne', sans-serif; font-size: 1rem; margin-bottom: .4rem; }
+    .project-body p { font-size: .8rem; color: var(--muted); margin-bottom: 1rem; line-height: 1.5; }
+    .project-tags { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: 1rem; }
+    .tag { font-size: .7rem; padding: .2rem .6rem; border-radius: 20px; background: rgba(124,58,237,.15); border: 1px solid rgba(124,58,237,.3); color: var(--accent3); }
+    .project-links { display: flex; gap: .8rem; }
+    .proj-btn {
+      display: flex; align-items: center; gap: .4rem;
+      font-size: .78rem; padding: .4rem .9rem; border-radius: 6px;
+      cursor: pointer; text-decoration: none; transition: all .2s;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .proj-btn.demo { background: var(--accent); color: #fff; border: none; }
+    .proj-btn.demo:hover { background: #6d28d9; }
+    .proj-btn.gh { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .proj-btn.gh:hover { border-color: var(--accent3); }
+
+    /* ── ABOUT + CONTACT ── */
+    #about-contact { background: var(--bg); }
+    .split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; }
+    .about-desc { color: var(--muted); line-height: 1.8; font-size: .92rem; margin-bottom: 2rem; }
+    .skills-list { display: flex; flex-direction: column; gap: .8rem; }
+    .skill-row { display: flex; flex-direction: column; gap: .3rem; }
+    .skill-info { display: flex; justify-content: space-between; font-size: .82rem; }
+    .skill-name { display: flex; align-items: center; gap: .5rem; }
+    .skill-pct { color: var(--accent2); font-weight: 600; }
+    .skill-bar { height: 5px; background: rgba(255,255,255,.08); border-radius: 10px; overflow: hidden; }
+    .skill-fill { height: 100%; border-radius: 10px; background: linear-gradient(90deg,var(--accent),var(--accent2)); transition: width 1s ease; }
+    /* contact */
+    .contact-form { display: flex; flex-direction: column; gap: 1rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-input {
+      background: rgba(255,255,255,.04); border: 1px solid var(--border);
+      border-radius: 8px; padding: .75rem 1rem; color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: .88rem; outline: none;
+      transition: border-color .2s; width: 100%;
+    }
+    .form-input:focus { border-color: var(--accent3); }
+    textarea.form-input { min-height: 120px; resize: vertical; }
+    .contact-meta { display: flex; flex-direction: column; gap: .75rem; margin-top: 1.5rem; }
+    .meta-row { display: flex; align-items: center; gap: .8rem; font-size: .85rem; color: var(--muted); }
+    .meta-icon { color: var(--accent2); font-size: 1rem; width: 20px; }
+    .download-resume {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: transparent; border: 1.5px solid var(--accent3);
+      color: var(--accent3); padding: .6rem 1.2rem; border-radius: 8px;
+      font-size: .85rem; cursor: pointer; margin-top: 1rem;
+      font-family: 'DM Sans', sans-serif; transition: all .2s;
+    }
+    .download-resume:hover { background: rgba(167,139,250,.1); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--bg2); border-top: 1px solid var(--border);
+      padding: 3rem 5% 1.5rem;
+    }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 2fr; gap: 2.5rem; margin-bottom: 2rem; }
+    .footer-brand p { color: var(--muted); font-size: .83rem; margin-top: .5rem; line-height: 1.6; max-width: 220px; }
+    .footer-col h4 { font-family: 'Syne', sans-serif; font-size: .9rem; margin-bottom: 1rem; color: var(--text); }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: .5rem; }
+    .footer-col ul a { color: var(--muted); text-decoration: none; font-size: .83rem; transition: color .2s; }
+    .footer-col ul a:hover { color: var(--accent3); }
+    .newsletter-row { display: flex; gap: .6rem; margin-top: .8rem; }
+    .newsletter-input {
+      flex: 1; background: rgba(255,255,255,.05); border: 1px solid var(--border);
+      border-radius: 6px; padding: .55rem .8rem; color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: .83rem; outline: none;
+    }
+    .subscribe-btn {
+      background: var(--accent); border: none; color: #fff;
+      padding: .55rem 1rem; border-radius: 6px; font-size: .83rem;
+      cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background .2s;
+    }
+    .subscribe-btn:hover { background: #6d28d9; }
+    .footer-bottom { border-top: 1px solid var(--border); padding-top: 1.2rem; display: flex; justify-content: center; }
+    .footer-bottom p { color: var(--muted); font-size: .78rem; }
+
+    /* ── SCROLL TO TOP ── */
+    .scroll-top {
+      position: fixed; bottom: 2rem; right: 2rem;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--accent); border: none; color: #fff;
+      font-size: 1.1rem; cursor: pointer;
+      box-shadow: 0 4px 20px var(--glow); transition: transform .2s;
+      display: grid; place-items: center; z-index: 50;
+    }
+    .scroll-top:hover { transform: translateY(-3px); }
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:900px){
+      #home { grid-template-columns: 1fr; padding-top: 6rem; }
+      .hero-right { display: none; }
+      .projects-grid { grid-template-columns: 1fr; }
+      .split-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .safety-inner { grid-template-columns: 1fr; }
+    }
+    @media(max-width:600px){
+      .nav-links { display: none; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M16 2L4 8V17C4 23.6 9.4 29.6 16 31C22.6 29.6 28 23.6 28 17V8L16 2Z" fill="rgba(124,58,237,0.25)" stroke="#7c3aed" stroke-width="1.5"/>
+      <path d="M11 16l3 3 7-7" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div>
+      <div>SafeWeb</div>
+      <span>by Margaret</span>
+    </div>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#home" class="active">Home</a></li>
+    <li><a href="#about-contact">About</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#safety">Safety Checker</a></li>
+    <li><a href="#about-contact">Contact</a></li>
+  </ul>
+  <button class="nav-cta">Let's Talk →</button>
+</nav>
+
+<!-- HERO -->
+<section id="home">
+  <div class="hero-text">
+    <div class="hero-tag">Hi, I'm 🔥</div>
+    <h1 class="hero-name">Margaret</h1>
+    <div class="hero-sub">Aspiring Full-Stack Developer</div>
+    <p class="hero-desc">I build modern websites and tools that are fast, responsive and keep users safe online.</p>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="document.getElementById('projects').scrollIntoView({behavior:'smooth'})">View My Work →</button>
+      <button class="btn-secondary" onclick="document.getElementById('safety').scrollIntoView({behavior:'smooth'})">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1L3 5v6c0 6.55 3.88 12.74 9 14.28C17.12 23.74 21 17.55 21 11V5L12 1z"/></svg>
+        Try Safety Checker
+      </button>
+    </div>
+    <p class="connect-label">Connect with me</p>
+    <div class="social-links">
+      <a href="#" title="GitHub">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.49.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.56-1.11-4.56-4.95 0-1.09.39-1.98 1.03-2.68-.10-.25-.45-1.27.10-2.64 0 0 .84-.27 2.75 1.02A9.58 9.58 0 0112 6.8c.85.004 1.71.115 2.51.337 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.85-2.34 4.7-4.57 4.95.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10.01 10.01 0 0022 12c0-5.52-4.48-10-10-10z"/></svg>
+      </a>
+      <a href="#" title="LinkedIn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.554v-5.57c0-1.328-.024-3.037-1.85-3.037-1.852 0-2.135 1.446-2.135 2.94v5.667H9.358V9h3.414v1.561h.049c.475-.9 1.635-1.85 3.366-1.85 3.601 0 4.267 2.37 4.267 5.455v6.284zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      </a>
+      <a href="#" title="Email">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></svg>
+      </a>
+      <a href="#" title="Instagram">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="hero-orb"></div>
+    <div class="hero-orb2"></div>
+    <div class="hero-photo-wrap">
+      <div class="hero-photo-placeholder">👩‍💻</div>
+      <div class="float-card top-right">
+        <div class="float-icon">⚡</div>
+        <div class="fc-label">Skills</div>
+        <div class="fc-val">Clean Code</div>
+        <div style="color:var(--muted);font-size:.7rem">Smart Solutions</div>
+        <div style="color:var(--muted);font-size:.7rem">Better Web</div>
+      </div>
+      <div class="float-card mid-right">
+        <div style="font-size:1.4rem;text-align:center;color:var(--accent2)">&lt;/&gt;</div>
+      </div>
+      <div class="float-card bottom-left">
+        <div class="fc-label">Status</div>
+        <div class="fc-val" style="color:#10b981">● Available for work</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="sec-center">
+    <div class="sec-label">What I Do</div>
+    <h2 class="sec-title">Services I Can Provide</h2>
+    <div class="sec-divider"></div>
+  </div>
+  <div class="services-grid">
+    <div class="service-card">
+      <div class="service-icon">🖥️</div>
+      <h3>Web Design</h3>
+      <p>I create modern, clean and user-friendly designs that make a strong impression.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">&lt;/&gt;</div>
+      <h3>Front-End Development</h3>
+      <p>I build responsive websites using HTML, CSS, JavaScript with clean and efficient code.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">⚙️</div>
+      <h3>Back-End Development</h3>
+      <p>I build secure and scalable back-end systems using Python, Flask and databases.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">🗄️</div>
+      <h3>Database Management</h3>
+      <p>I design and manage databases that store and organize data efficiently.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">🛡️</div>
+      <h3>Safety & Scam Detection</h3>
+      <p>I build tools that help users identify scams, fake websites and suspicious numbers.</p>
+    </div>
+  </div>
+  <div class="services-cta">
+    <button class="btn-secondary" style="display:inline-flex;margin-top:1rem">👤 Let's Work Together</button>
+  </div>
+</section>
+
+<!-- SAFETY CHECKER -->
+<section id="safety">
+  <div class="safety-inner">
+    <div>
+      <div class="safety-icon-wrap">
+        <div class="safety-shield">🛡️</div>
+      </div>
+    </div>
+    <div class="safety-form">
+      <div class="sec-label">Stay Safe Online</div>
+      <h2 class="sec-title" style="font-size:1.6rem">Safety Checker</h2>
+      <p style="color:var(--muted);font-size:.88rem">Enter a URL or phone number to check for scams, threats and suspicious activity.</p>
+      <div class="input-row">
+        <input class="safety-input" type="text" placeholder="Enter URL or phone number" id="safetyInput"/>
+        <button class="btn-primary" onclick="checkSafety()" style="white-space:nowrap">🔍 Check Safety</button>
+      </div>
+      <div class="safety-result" id="safetyResult">
+        <div class="dot"></div>
+        <div><strong>Safe</strong> — This site appears to be safe and trustworthy.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="projects-header">
+    <div>
+      <div class="sec-label">My Work</div>
+      <h2 class="sec-title">Featured Projects</h2>
+      <div class="sec-divider"></div>
+    </div>
+    <a href="#" class="view-all">View All Projects →</a>
+  </div>
+  <div class="projects-grid">
+    <div class="project-card">
+      <div class="project-img">🖥️</div>
+      <div class="project-body">
+        <h3>Personal Portfolio</h3>
+        <p>A modern portfolio website to showcase my skills and projects.</p>
+        <div class="project-tags">
+          <span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JavaScript</span>
+        </div>
+        <div class="project-links">
+          <a href="#" class="proj-btn demo">⚡ Live Demo</a>
+          <a href="#" class="proj-btn gh">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.49.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.56-1.11-4.56-4.95 0-1.09.39-1.98 1.03-2.68-.10-.25-.45-1.27.10-2.64 0 0 .84-.27 2.75 1.02A9.58 9.58 0 0112 6.8c.85.004 1.71.115 2.51.337 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.85-2.34 4.7-4.57 4.95.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10.01 10.01 0 0022 12c0-5.52-4.48-10-10-10z"/></svg>
+            GitHub
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="project-card">
+      <div class="project-img">🔢</div>
+      <div class="project-body">
+        <h3>Calculator App</h3>
+        <p>A responsive calculator app built with HTML, CSS and JavaScript.</p>
+        <div class="project-tags">
+          <span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JavaScript</span>
+        </div>
+        <div class="project-links">
+          <a href="#" class="proj-btn demo">⚡ Live Demo</a>
+          <a href="#" class="proj-btn gh">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.49.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.56-1.11-4.56-4.95 0-1.09.39-1.98 1.03-2.68-.10-.25-.45-1.27.10-2.64 0 0 .84-.27 2.75 1.02A9.58 9.58 0 0112 6.8c.85.004 1.71.115 2.51.337 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.85-2.34 4.7-4.57 4.95.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10.01 10.01 0 0022 12c0-5.52-4.48-10-10-10z"/></svg>
+            GitHub
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="project-card">
+      <div class="project-img" style="background:linear-gradient(135deg,rgba(239,68,68,.2),rgba(124,58,237,.15))">🔍</div>
+      <div class="project-body">
+        <h3>Fake Product Detector</h3>
+        <p>Detects fake or scam products using data analysis and user reports.</p>
+        <div class="project-tags">
+          <span class="tag">Python</span><span class="tag">Machine Learning</span>
+        </div>
+        <div class="project-links">
+          <a href="#" class="proj-btn demo">⚡ Live Demo</a>
+          <a href="#" class="proj-btn gh">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.49.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.56-1.11-4.56-4.95 0-1.09.39-1.98 1.03-2.68-.10-.25-.45-1.27.10-2.64 0 0 .84-.27 2.75 1.02A9.58 9.58 0 0112 6.8c.85.004 1.71.115 2.51.337 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.85-2.34 4.7-4.57 4.95.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10.01 10.01 0 0022 12c0-5.52-4.48-10-10-10z"/></svg>
+            GitHub
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT + CONTACT -->
+<section id="about-contact">
+  <div class="split-grid">
+    <!-- ABOUT -->
+    <div>
+      <div class="sec-label">About Me</div>
+      <h2 class="sec-title">About Me</h2>
+      <div class="sec-divider"></div>
+      <p class="about-desc">I'm a student and aspiring developer who loves coding, building useful tools and solving real-world problems. I'm passionate about cybersecurity and creating solutions that make the internet a safer place.</p>
+      <div class="skills-list">
+        <div class="skill-row">
+          <div class="skill-info"><span class="skill-name">🟧 HTML</span><span class="skill-pct">95%</span></div>
+          <div class="skill-bar"><div class="skill-fill" style="width:95%"></div></div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-info"><span class="skill-name">🟦 CSS</span><span class="skill-pct">90%</span></div>
+          <div class="skill-bar"><div class="skill-fill" style="width:90%"></div></div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-info"><span class="skill-name">🟨 JavaScript</span><span class="skill-pct">75%</span></div>
+          <div class="skill-bar"><div class="skill-fill" style="width:75%"></div></div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-info"><span class="skill-name">🐍 Python</span><span class="skill-pct">70%</span></div>
+          <div class="skill-bar"><div class="skill-fill" style="width:70%"></div></div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-info"><span class="skill-name">☕ Java</span><span class="skill-pct">65%</span></div>
+          <div class="skill-bar"><div class="skill-fill" style="width:65%"></div></div>
+        </div>
+      </div>
+    </div>
+    <!-- CONTACT -->
+    <div>
+      <div class="sec-label">Get In Touch</div>
+      <h2 class="sec-title">Contact Me</h2>
+      <div class="sec-divider"></div>
+      <div class="contact-form">
+        <div class="form-row">
+          <input class="form-input" type="text" placeholder="Your Name"/>
+          <input class="form-input" type="email" placeholder="Your Email"/>
+        </div>
+        <textarea class="form-input" placeholder="Your Message"></textarea>
+        <button class="btn-primary" style="align-self:flex-start">✉️ Send Message</button>
+      </div>
+      <div class="contact-meta">
+        <div class="meta-row"><span class="meta-icon">✉️</span> margaret@example.com</div>
+        <div class="meta-row"><span class="meta-icon">📞</span> +123 456 7890</div>
+        <div class="meta-row"><span class="meta-icon">📍</span> Your Location</div>
+      </div>
+      <button class="download-resume">⬇ Download Resume</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="nav-logo">
+        <svg viewBox="0 0 32 32" fill="none" width="26" height="26">
+          <path d="M16 2L4 8V17C4 23.6 9.4 29.6 16 31C22.6 29.6 28 23.6 28 17V8L16 2Z" fill="rgba(124,58,237,0.25)" stroke="#7c3aed" stroke-width="1.5"/>
+          <path d="M11 16l3 3 7-7" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-weight:800">SafeWeb</div>
+          <span style="color:var(--accent2);font-size:.65rem">by Margaret</span>
+        </div>
+      </div>
+      <p>Building modern websites and tools for a safer online world.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="#home">Home</a></li>
+        <li><a href="#about-contact">About</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#safety">Safety Checker</a></li>
+        <li><a href="#about-contact">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Follow Me</h4>
+      <ul>
+        <li><a href="#">GitHub</a></li>
+        <li><a href="#">LinkedIn</a></li>
+        <li><a href="#">Instagram</a></li>
+        <li><a href="#">Email</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Newsletter</h4>
+      <p style="color:var(--muted);font-size:.82rem">Stay updated with new projects and articles.</p>
+      <div class="newsletter-row">
+        <input class="newsletter-input" type="email" placeholder="Enter your email"/>
+        <button class="subscribe-btn">Subscribe</button>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2024 Margaret. All rights reserved.</p>
+  </div>
+</footer>
+
+<!-- SCROLL TO TOP -->
+<button class="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+  // Safety checker mock
+  function checkSafety() {
+    const val = document.getElementById('safetyInput').value.trim();
+    const res = document.getElementById('safetyResult');
+    if (!val) return;
+    const suspicious = ['spam','scam','hack','phish','free-money','win','prize'];
+    const isBad = suspicious.some(w => val.toLowerCase().includes(w));
+    if (isBad) {
+      res.style.background = 'rgba(239,68,68,.08)';
+      res.style.borderColor = 'rgba(239,68,68,.3)';
+      res.innerHTML = '<div style="width:10px;height:10px;background:#ef4444;border-radius:50%;flex-shrink:0"></div><div><strong style="color:#ef4444">Warning</strong> — This URL or number appears suspicious. Proceed with caution.</div>';
+    } else {
+      res.style.background = 'rgba(16,185,129,.08)';
+      res.style.borderColor = 'rgba(16,185,129,.3)';
+      res.innerHTML = '<div style="width:10px;height:10px;background:#10b981;border-radius:50%;flex-shrink:0"></div><div><strong style="color:#10b981">Safe</strong> — This site appears to be safe and trustworthy.</div>';
+    }
+  }
+
+  // Active nav on scroll
+  const sections = document.querySelectorAll('section[id]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 120) current = s.id; });
+    document.querySelectorAll('.nav-links a').forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  });
+
+  // Enter key on safety input
+  document.getElementById('safetyInput').addEventListener('keydown', e => { if(e.key==='Enter') checkSafety(); });
+</script>
+</body>
+</html>
